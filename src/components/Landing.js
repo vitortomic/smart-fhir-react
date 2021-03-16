@@ -10,8 +10,9 @@ export const Landing = () => {
     <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <Link to="/launcher">Launch</Link>
+          <Link to={`/launcher${window.location.search}`}>Launch</Link>
         </header>
     </div>
   )
+
 }
