@@ -8,6 +8,7 @@ export const Patient = () => {
 
     const fetchPatient = async () => {
         try {
+            console.log(client)
             const patient = await client.patient.read()
             console.log(patient)
             setPatient(patient)
@@ -18,7 +19,7 @@ export const Patient = () => {
     }
 
     useEffect(() => {
-        if (client && !patient) {
+        if (client && !patient && !error) {
             fetchPatient();
         }
       }, [fetchPatient]);
