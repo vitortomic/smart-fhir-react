@@ -8,9 +8,7 @@ export const Patient = () => {
 
     const fetchPatient = async () => {
         try {
-            console.log(client)
             const patient = await client.patient.read()
-            console.log(patient)
             setPatient(patient)
         }
         catch (error) {
