@@ -21,7 +21,7 @@ export const Launcher = () => {
         SMART.settings.fullSessionStorageSupport = !(window.external && typeof window.external.DiscernObjectFactory !== 'undefined')
         SMART.authorize({
             clientId: "ade8d11b-898f-42dd-9d84-5bac2b1cd8b3",// epic:"6c12dff4-24e7-4475-a742-b08972c4ea27",
-            scope: "patient/Patient.read patient/Observation.read patient/Immunization.read launch offline_access openid profile",
+            scope: "patient/Patient.read patient/Observation.read patient/Immunization.read patient/MedicationStatement.read patient/Condition.Read launch offline_access openid profile",
             redirectUri: "./home",
             iss: iss ? iss : FALLBACK_ISS,
     
