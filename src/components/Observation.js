@@ -19,7 +19,6 @@ export const Observation = () => {
     const [bmi, setBmi] = useState(null)
     const [bodyWeight, setBodyWeight] = useState(null)
     const [bodyHeight, setBodyHeight] = useState(null)
-    //const [chartRef, setChartRef] = useState(null)
 
     const fetchObservations = async () => {
         try {
