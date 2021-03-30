@@ -48,8 +48,12 @@ export const Observation = () => {
                     yAxes: [{
                         ticks: {
                             beginAtZero: true
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: unit
                         }
-                    }]
+                    }],
                 },
                 tooltips: {
                     callbacks: {
@@ -69,7 +73,7 @@ export const Observation = () => {
                 ))}
              </ul>
             <br/>
-            <div style={{width:'400px',height:'400px'}}>
+            <div style={{width:'500px',height:'500px', margin: '200px'}}>
                 <canvas ref={chartElement} width="400" height="400"></canvas>
             </div>
         </div>
