@@ -23,7 +23,7 @@ export const Observation = () => {
 
     const extractBmi = () => {
         const bmi = observations.filter(observation => observation.resource.code.coding[0].code === '39156-5')
-            .sort((a, b) => a.resource.valueQuantity.value - b.resource.valueQuantity.value)
+            .sort((a, b) => new Date(a.resource.issued) - new Date(b.resource.issued))
         setBmi(bmi)
     }
 
