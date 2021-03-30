@@ -91,7 +91,7 @@ export const Observation = () => {
                 ))}
              </ul>
             <br/>
-            <div style={{width:'1000px',height:'500px', margin: '200px'}}>
+            <div style={{width:'1000px',height:'500px', margin: '50px'}}>
                 <canvas ref={chartElement} width="800" height="400"></canvas>
             </div>
         </div>
