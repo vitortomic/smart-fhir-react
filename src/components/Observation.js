@@ -8,6 +8,8 @@ codes.set('bmi', '39156-5')
 codes.set('body weight', '29463-7')
 codes.set('body height', '8302-2')
 
+let chartRef = null
+
 export const Observation = () => {
     const client = useContext(FhirClientContext)
     const [observations, setObservations] = useState(null)
@@ -17,6 +19,7 @@ export const Observation = () => {
     const [bmi, setBmi] = useState(null)
     const [bodyWeight, setBodyWeight] = useState(null)
     const [bodyHeight, setBodyHeight] = useState(null)
+    //const [chartRef, setChartRef] = useState(null)
 
     const fetchObservations = async () => {
         try {
@@ -60,12 +63,21 @@ export const Observation = () => {
             fetchObservations();
         }
         if (bmi && bmi.length > 0) {
+            if (chartRef) {
+                chartRef.destroy()
+            }
             initializeChart(extractData(bmi))
         }
         if (bodyWeight && bodyWeight.length > 0) {
+            if (chartRef) {
+                chartRef.destroy()
+            }
             initializeChart(extractData(bodyWeight))
         }
         if (bodyHeight && bodyHeight.length > 0) {
+            if (chartRef) {
+                chartRef.destroy()
+            }
             initializeChart(extractData(bodyHeight))
         }
       });
@@ -80,7 +92,7 @@ export const Observation = () => {
     }
 
     const initializeChart = ({measurement, labels, data, unit}) => {
-        new Chart(chartElement.current, {
+        const chart = new Chart(chartElement.current, {
             type: 'bar',
             data: {
                 labels: labels, 
@@ -110,6 +122,7 @@ export const Observation = () => {
                 }
             }
         });
+        chartRef = chart
     }
     
     return (
