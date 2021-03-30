@@ -3,12 +3,20 @@ import { FhirClientContext } from "../FhirClientContext";
 import Chart from 'chart.js';
 import moment from 'moment';
 
+const codes = new Map()
+codes.set('bmi', '39156-5')
+codes.set('body weight', '29463-7')
+codes.set('body height', '8302-2')
+
 export const Observation = () => {
     const client = useContext(FhirClientContext)
     const [observations, setObservations] = useState(null)
-    const [bmi, setBmi] = useState(null)
     const chartElement = useRef(null);
     const [error, setError] = useState(null)
+
+    const [bmi, setBmi] = useState(null)
+    const [bodyWeight, setBodyWeight] = useState(null)
+    const [bodyHeight, setBodyHeight] = useState(null)
 
     const fetchObservations = async () => {
         try {
@@ -21,22 +29,44 @@ export const Observation = () => {
         }
     }
 
-    const extractBmi = () => {
-        const bmi = observations.filter(observation => observation.resource.code.coding[0].code === '39156-5')
+    const extractValues = (code) => {
+        return observations.filter(observation => observation.resource.code.coding[0].code === code)
             .sort((a, b) => new Date(a.resource.issued) - new Date(b.resource.issued))
+    }
+
+    const extractBmi = () => {
+        setBodyWeight(null)
+        setBodyHeight(null)
+        const bmi = extractValues(codes.get('bmi'))
         setBmi(bmi)
+    }
+
+    const extractBodyWeight = () => {
+        setBmi(null)
+        setBodyHeight(null)
+        const bodyWeight = extractValues(codes.get('body weight'))
+        setBodyWeight(bodyWeight)
+    }
+
+    const extractBodyHeight = () => {
+        setBmi(null)
+        setBodyWeight(null)
+        const bodyHeight = extractValues(codes.get('body height'))
+        setBodyHeight(bodyHeight)
     }
 
     useEffect( () => {
         if (client && !observations && !error) {
             fetchObservations();
         }
-        if (observations && !bmi) {
-            extractBmi()
-        }
         if (bmi && bmi.length > 0) {
-            //initializeChart('bmi', ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'], [12, 19, 3, 5, 2, 3], 'idx')
             initializeChart(extractData(bmi))
+        }
+        if (bodyWeight && bodyWeight.length > 0) {
+            initializeChart(extractData(bodyWeight))
+        }
+        if (bodyHeight && bodyHeight.length > 0) {
+            initializeChart(extractData(bodyHeight))
         }
       });
     
@@ -84,13 +114,13 @@ export const Observation = () => {
     
     return (
         <div>
-            BMI:
-             <ul>
-                {bmi && bmi.map(bmiReading => (
-                    <li>Measured on {bmiReading.resource.issued} value: {bmiReading.resource.valueQuantity.value}{bmiReading.resource.valueQuantity.unit}</li>
-                ))}
-             </ul>
-            <br/>
+            { observations && (
+                <>
+                    <button onClick={extractBmi}>bmi</button>
+                    <button onClick={extractBodyWeight}>body weight</button>
+                    <button onClick={extractBodyHeight}>body height</button>
+                </>
+            )}
             <div style={{width:'1000px',height:'500px', margin: '50px'}}>
                 <canvas ref={chartElement} width="800" height="400"></canvas>
             </div>
