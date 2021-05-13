@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
+import { getPatient } from "../api";
 import { FhirClientContext } from "../FhirClientContext";
 
 export const Patient = () => {
@@ -8,7 +9,7 @@ export const Patient = () => {
 
     const fetchPatient = async () => {
         try {
-            const patient = await client.patient.read()
+            const patient = await getPatient(client)
             setPatient(patient)
         }
         catch (error) {

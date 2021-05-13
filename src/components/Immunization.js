@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { FhirClientContext } from "../FhirClientContext";
+import { getImmunizations } from '../api'
 
 export const Immunization = () => {
     const client = useContext(FhirClientContext)
@@ -8,7 +9,7 @@ export const Immunization = () => {
 
     const fetchImmunizations = async () => {
         try {
-            const immunizations = await client.patient.request("Immunization")
+            const immunizations = await getImmunizations(client)
             setImmunizations(immunizations.entry)
         }
         catch (error) {

@@ -1,10 +1,12 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { FhirClientContext } from "../FhirClientContext";
-import { Container, Box, Grid, Fade, Typography, Paper } from '@material-ui/core';
+import { Container, Box, Grid, Fade, Typography, Fab } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 import { makeStyles } from '@material-ui/core/styles';
 import { StyledButton } from './StyledButton';
 import { Spinner } from './Spinner';
 import { TopBar } from './TopBar';
+import { getObservations } from '../api'
 import { PatientDetails } from './PatientDetails'
 import Chart from 'chart.js';
 import 'chartjs-plugin-annotation';
@@ -48,6 +50,16 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
         margin: theme.spacing(2),
         color: 'grey'
+    },
+    fab: {
+        position: 'fixed',
+        bottom: '50px',
+        right: '50px',
+        color: 'white',
+        fontWeight: 'bold'
+    },
+    alert: {
+        marginTop: 50
     }
   }));
 
@@ -84,19 +96,24 @@ export const Observation = () => {
     const [observations, setObservations] = useState(null)
     const chartElement = useRef(null);
     const [error, setError] = useState(null)
-
     const [ddimmer, setDdimmer] = useState(null)
     const [crp, setCrp] = useState(null)
     const [leukocytes, setLeukocytes] = useState(null)
+    const [showAlert, setShowAlert] = useState(null)
+
+    /* MOCK DATA */
+    const [generateMockData, setGenerateMockData] = useState(false)
+    const mockData = () => {
+        setGenerateMockData(true)
+        // here mock lab results relevant to covid-19 treatment are added for testing purposes
+        addMockPatientData(observations)
+        setObservations(observations)
+    }
+    /* MOCK DATA */
 
     const fetchObservations = async () => {
         try {
-            const observations = await client.patient.request("Observation")
-            // add covid mock results here
-
-            // here mock lab results relevant to covid-19 treatment are added for testing purposes
-            addMockPatientData(observations.entry)
-
+            const observations = await getObservations(client)
             setObservations(observations.entry)
             console.log(observations)
         }
@@ -113,21 +130,33 @@ export const Observation = () => {
     const extractDdimmer = () => {
         setCrp(null)
         setLeukocytes(null)
+        setShowAlert(false)
         const ddimmer = extractValues(codes.get('D-dimmer'))
+        if (ddimmer.length === 0) {
+            setShowAlert(true)
+        }
         setDdimmer(ddimmer)
     }
 
     const extractCrp = () => {
         setDdimmer(null)
         setLeukocytes(null)
+        setShowAlert(false)
         const crp = extractValues(codes.get('crp'))
+        if (crp.length === 0) {
+            setShowAlert(true)
+        }
         setCrp(crp)
     }
 
     const extractLeukocytes = () => {
         setDdimmer(null)
         setCrp(null)
+        setShowAlert(false)
         const leukocytes = extractValues(codes.get('Leukocytes in blood'))
+        if (leukocytes.length === 0) {
+            setShowAlert(true)
+        }
         setLeukocytes(leukocytes)
     }
 
@@ -143,7 +172,8 @@ export const Observation = () => {
         }
         if (leukocytes && leukocytes.length > 0) {
             initializeChart(extractData(leukocytes), 'Leukocytes in blood')
-        }
+        } 
+       
       });
     
     const extractData = (data) => {
@@ -159,7 +189,7 @@ export const Observation = () => {
         if (chartRef) {
             chartRef.destroy()
         }
-        const chart = new Chart(chartElement.current, {
+        chartRef = new Chart(chartElement.current, {
             type: 'bar',
             data: {
                 labels: labels, 
@@ -193,7 +223,6 @@ export const Observation = () => {
                 }
             },
         });
-        chartRef = chart
     }
     
     return (
@@ -204,6 +233,9 @@ export const Observation = () => {
             )}
             <PatientDetails />
             <Container style={{marginLeft:'300px'}}>
+                { !generateMockData && <Fab className={classes.fab} onClick={mockData} color="primary" variant="extended">
+                    Generate test observations
+                </Fab>}
                 <Fade in={observations}>
                     <Box className={classes.wrapper}>
                         { observations && (
@@ -222,6 +254,9 @@ export const Observation = () => {
                                 </Grid> 
                             </>
                         )}
+                        <Fade in={showAlert}>
+                            <Alert className={classes.alert} onClose={() => {setShowAlert(false)}} severity="warning">Patient does not have lab results for the selected type! </Alert>
+                        </Fade>
                         <Fade in={ddimmer || leukocytes || crp}>
                             <Box className={classes.chart}>
                                 <canvas ref={chartElement} width="800" height="400"></canvas>
