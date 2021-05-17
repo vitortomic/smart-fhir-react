@@ -6,8 +6,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import { StyledButton } from './StyledButton';
 import { Spinner } from './Spinner';
 import { TopBar } from './TopBar';
-import { getObservations } from '../api'
+import { getObservations } from '../API'
 import { PatientDetails } from './PatientDetails'
+import { LEUKOCYTE_NAME, LEUKOCYTE_CODE, CRP_NAME, CRP_CODE, DDIMMER_NAME, DDIMMER_CODE } from '../constants/Constants'
 import Chart from 'chart.js';
 import 'chartjs-plugin-annotation';
 import moment from 'moment';
@@ -16,14 +17,14 @@ import moment from 'moment';
 import { addMockPatientData } from './mock/mockPatientData'
 
 const codes = new Map()
-codes.set('D-dimmer', '55449-3')
-codes.set('crp', '30522-7')
-codes.set('Leukocytes in blood', '6690-2')
+codes.set(DDIMMER_NAME, DDIMMER_CODE)
+codes.set(CRP_NAME, CRP_CODE)
+codes.set(LEUKOCYTE_NAME, LEUKOCYTE_CODE)
 
 const borders = new Map()
-borders.set('D-dimmer', [{value: 0.5, direction: "<"}])
-borders.set('crp', [{value: 5.0, direction: "<"}])
-borders.set('Leukocytes in blood', [{value: 4.0, direction: ">"}, {value: 10.7, direction: "<"}])
+borders.set(DDIMMER_NAME, [{value: 0.5, direction: "<"}])
+borders.set(CRP_NAME, [{value: 5.0, direction: "<"}])
+borders.set(LEUKOCYTE_NAME, [{value: 4.0, direction: ">"}, {value: 10.7, direction: "<"}])
 
 let chartRef = null
 
@@ -105,6 +106,7 @@ export const Observation = () => {
     const [generateMockData, setGenerateMockData] = useState(false)
     const mockData = () => {
         setGenerateMockData(true)
+        setShowAlert(false)
         // here mock lab results relevant to covid-19 treatment are added for testing purposes
         addMockPatientData(observations)
         setObservations(observations)
@@ -131,7 +133,7 @@ export const Observation = () => {
         setCrp(null)
         setLeukocytes(null)
         setShowAlert(false)
-        const ddimmer = extractValues(codes.get('D-dimmer'))
+        const ddimmer = extractValues(codes.get(DDIMMER_NAME))
         if (ddimmer.length === 0) {
             setShowAlert(true)
         }
@@ -142,7 +144,7 @@ export const Observation = () => {
         setDdimmer(null)
         setLeukocytes(null)
         setShowAlert(false)
-        const crp = extractValues(codes.get('crp'))
+        const crp = extractValues(codes.get(CRP_NAME))
         if (crp.length === 0) {
             setShowAlert(true)
         }
@@ -153,7 +155,7 @@ export const Observation = () => {
         setDdimmer(null)
         setCrp(null)
         setShowAlert(false)
-        const leukocytes = extractValues(codes.get('Leukocytes in blood'))
+        const leukocytes = extractValues(codes.get(LEUKOCYTE_NAME))
         if (leukocytes.length === 0) {
             setShowAlert(true)
         }
@@ -165,13 +167,13 @@ export const Observation = () => {
             fetchObservations();
         }
         if (ddimmer && ddimmer.length > 0) {
-            initializeChart(extractData(ddimmer), 'D-dimmer')
+            initializeChart(extractData(ddimmer), DDIMMER_NAME)
         }
         if (crp && crp.length > 0) {
-            initializeChart(extractData(crp), 'crp')
+            initializeChart(extractData(crp), CRP_NAME)
         }
         if (leukocytes && leukocytes.length > 0) {
-            initializeChart(extractData(leukocytes), 'Leukocytes in blood')
+            initializeChart(extractData(leukocytes), LEUKOCYTE_NAME)
         } 
        
       });
@@ -233,7 +235,7 @@ export const Observation = () => {
             )}
             <PatientDetails />
             <Container style={{marginLeft:'300px'}}>
-                { !generateMockData && <Fab className={classes.fab} onClick={mockData} color="primary" variant="extended">
+                { !generateMockData && showAlert && <Fab className={classes.fab} onClick={mockData} color="primary" variant="extended">
                     Generate test observations
                 </Fab>}
                 <Fade in={observations}>

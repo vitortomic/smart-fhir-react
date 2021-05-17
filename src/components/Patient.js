@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { getPatient } from "../api";
+import { getPatient } from "../API";
 import { FhirClientContext } from "../FhirClientContext";
 
 export const Patient = () => {

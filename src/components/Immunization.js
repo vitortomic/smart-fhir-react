@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { FhirClientContext } from "../FhirClientContext";
-import { getImmunizations } from '../api'
+import { getImmunizations } from '../API'
 
 export const Immunization = () => {
     const client = useContext(FhirClientContext)
